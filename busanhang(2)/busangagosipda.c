@@ -35,11 +35,7 @@ int turn = 0;
 
 int input_value() {
 
-	int train_lengt = 3;
-
-	scanf_s("%d", &train_length);
-
-	return train_length;
+	
 }
 
 int main () {
@@ -56,5 +52,6 @@ int main () {
 		return 0;
 
 	}
+	return 0;
 
 }
