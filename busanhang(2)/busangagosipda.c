@@ -30,7 +30,6 @@
 int train_length; //열차길이
 int percentile_probability; //이동 확률
 int madongseok_stamina; //마동석 체력
-int percentile_probability; //이동 확률
 int turn = 0;
 
 int input_value() {
@@ -43,13 +42,14 @@ int main () {
 	printf("train length(%d ~ %d)", LEN_MIN, LEN_MAX);
 	scanf_s("%d", &train_length);
 	if (train_length < LEN_MIN || train_length > LEN_MAX) {
+		
 
 	}
 	printf("percentile probability  (%d ~ %d) >> ", PROB_MIN, PROB_MAX);
 	scanf_s("%d", &percentile_probability);
 	if (percentile_probability  < PROB_MIN || percentile_probability  > PROB_MAX) {
-		printf("잘못된 입력입니다. 게임을 종료합니다.");
-		return 0;
+		
+		
 
 	}
 	return 0;
