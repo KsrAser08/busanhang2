@@ -13,14 +13,14 @@
 // 어그로 범위
 #define AGGRO_MIN 0
 #define AGGRO_MAX 5
-// 마동석이동방향
+// 마동석 이동방향
 #define MOVE_LEFT 1
 #define MOVE_STAY 0
-// 좀비의공격대상
+// 좀비의 공격대상
 #define ATK_NONE 0
 #define ATK_CITIZEN 1
 #define ATK_DONGSEOK 2
-// 마동석행동
+// 마동석 행동
 #define ACTION_REST 0
 #define ACTION_PROVOKE 1
 #define ACTION_PULL 2
@@ -90,7 +90,12 @@ int train(int ZOMB,int CITIZ,int MADONGS) {
 //좀비 움직이는 함수
 void zombie_move() {
 	if (turn % 2 != 0) {
-		zombie--;
+		if (madongseok_holding_zombie == 1) {
+			
+		}
+		else {
+			zombie--;
+		}
 	}
 	else {
 		zombie_cant_move++;
@@ -118,30 +123,49 @@ void citizen_move() {
 	}
 }
 
-//마동석 움직이는 함수
-int madongseok_move() {
-	while (1) {
-		printf("madongseok move(%d:stay, %d:left)>> ", MOVE_STAY, MOVE_LEFT);
-		scanf_s("%d", &madongseok_choose);
-		if (madongseok_choose == MOVE_LEFT) { //이동함 선택할 때
-			before_madongseok_aggro = madongseok_aggro;
-			madongseok_aggro++;
-			if (madongseok_aggro > AGGRO_MAX) madongseok_aggro = AGGRO_MAX;
-			madongseok--;
-		}
-		else if (madongseok_choose == MOVE_STAY) { //이동안함 선택할 때
-			before_madongseok_aggro = madongseok_aggro;
-			madongseok_aggro--;
-			madongseok_no_move++;
-			if (madongseok_aggro < AGGRO_MIN) {
-				madongseok_aggro = AGGRO_MIN;
+//좀비가 바로 앞에 없을 때 마동석 이동
+void madongseok_move_no_zombie() {
+	if (zombie != madongseok - 1) {
+		while (1) {
+			printf("madongseok move(%d:stay, %d:left)>> ", MOVE_STAY, MOVE_LEFT);
+			scanf_s("%d", &madongseok_choose);
+			if (madongseok_choose == MOVE_LEFT) { //이동함 선택할 때
+				before_madongseok_aggro = madongseok_aggro;
+				madongseok_aggro++;
+				if (madongseok_aggro > AGGRO_MAX) madongseok_aggro = AGGRO_MAX;
+				madongseok--;
 			}
-		} if (madongseok_choose == MOVE_LEFT || madongseok_choose == MOVE_STAY) break;
+			else if (madongseok_choose == MOVE_STAY) { //이동안함 선택할 때
+				before_madongseok_aggro = madongseok_aggro;
+				madongseok_aggro--;
+				madongseok_no_move++;
+				if (madongseok_aggro < AGGRO_MIN) {
+					madongseok_aggro = AGGRO_MIN;
+				}
+			} if (madongseok_choose == MOVE_LEFT || madongseok_choose == MOVE_STAY) break;
+		}
 	}
 }
-
+//좀비가 바로 앞에 있을때 마동석 이동
+void madongseok_move_with_zombie() {
+	if (zombie == madongseok - 1) {
+		while (1) {
+			printf("madongseok move(%d:stay)>> ", MOVE_STAY);
+			scanf_s("%d", &madongseok_choose);
+			if (madongseok_choose == MOVE_STAY) { //이동안함 선택할 때
+				before_madongseok_aggro = madongseok_aggro;
+				madongseok_aggro--;
+				madongseok_no_move++;
+				if (madongseok_aggro < AGGRO_MIN) madongseok_aggro = AGGRO_MIN;
+				if (madongseok_choose == MOVE_LEFT || madongseok_choose == MOVE_STAY) {
+					break;
+				}
+			}
+		}
+	}
+}
 //시민 현재 상황 출력
-int citizen_now() {
+void citizen_now() {
 	printf("\n");
 	if (citizen_stay == 1) { //시민이 멈춰있을때
 		if (citizen_aggro != before_citizen_aggro) {
@@ -163,11 +187,16 @@ int citizen_now() {
 }
 //좀비 현재상황 출력
 void zombie_now() {
-	//좀비가 이동할 수 없는 턴일 때x`
+	//좀비가 이동할 수 없는 턴일 때
 	if (zombie_cant_move == 1) {
 		printf("zombie : STAY -> %d(Can't Move)\n", zombie);
 		zombie_cant_move = 0;
-	} else {
+	}
+	else if (madongseok_holding_zombie == 1) { //마동석에게 잡혀있을 때
+		printf("zombie : STAY -> %d\n", zombie);
+		madongseok_holding_zombie = 0;
+	}
+	else {
 		// 좀비가 이동할 때
 		printf("zombie : %d -> %d\n\n", zombie + 1, zombie);
 		zombie_stay = 0;
@@ -194,13 +223,10 @@ void madongseok_now(){
 		
 	}
 }
-//시민과 좀비 액션 없을때
+//시민 액션 없을 때
 void result() {
 	if (citizen != 1) {
 		printf("citizen does nothing.\n");
-	}
-	if (zombie != madongseok - 1) {
-		printf("zombie attacked nobody.\n\n");
 	}
 }
 //마동석 액션
@@ -282,6 +308,35 @@ int madongseok_stamina_zero(void) {
 		exit(1);
 	}
 }
+
+//좀비 주변에 아무도 없을 때
+void zombie_action_nobody() {
+	if (zombie == madongseok - 1 || zombie == citizen + 1) {
+		printf("zombie attacked nobody.\n\n");
+	}
+}
+
+//좀비 주변에 시민 또는 마동석이 있을 때
+void zombie_action_attack_citizen() {
+	if (zombie == citizen + 1) {
+		citizen_dead_ending();
+	}
+	else if (zombie == madongseok - 1) {
+
+	}
+}
+
+//좀비 주변에 둘 다 있을 때 어그로 비교
+void zombie_action_aggro_fight() {
+
+}
+
+//시민 죽음
+int citizen_dead_ending() {
+	printf("GAME OEVER! citizen dead...");
+	exit(1);
+}
+
 //줄바꾸기 함수
 void changing_the_line() {
 	printf("\n");
@@ -307,7 +362,8 @@ int main (void) {
 		citizen_now(); //시민 현재상황 출력
 		zombie_now(); //좀비 현재상황 출력
 
-		madongseok_move();//마동석 이동
+		madongseok_move_with_zombie();//마동석 주변에 좀비 있을 때 이동
+		madongseok_move_no_zombie();//마동석 주변에 좀비 없을 때 이동
 
 		train(zombie, citizen, madongseok); //두 번째 열차 출력
 
@@ -316,6 +372,11 @@ int main (void) {
 		madongseok_now(); //마동석 현재상황 출력
 
 		result(); //결과 출력
+
+		zombie_action_nobody(); //좀비 행동(주변 아무도 없을때)
+		zombie_action_attack_citizen(); //좀비 행동(시민을 물었을 때)
+		zombie_action_aggro_fight(); //좀비 행동(어그로 더 높은 쪽 공격 (시민 공격시 게임 끝, 마동석 공격시 STM 1감소))
+
 		
 		madongseok_action(); //마동석 액션
 		changing_the_line(); //줄 변경
@@ -330,3 +391,10 @@ int main (void) {
 	}
 	return 0;
 }
+
+
+
+
+//지금 고쳐야 하는거 -> 좀비 시민 마동석 위치 처음 감소하는거에 대한 오류
+
+//지금 해야하는거 -> 좀비가 어그로 높은 쪽으로 이동해야함, 좀비 주변에 둘중에 하나 있거나 둘다 있거나 
