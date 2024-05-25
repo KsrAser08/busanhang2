@@ -41,7 +41,8 @@ int madongseok_choose; //마동석 행동 or 휴식 scanf_s 선택
 int madongseok_no_move; //움직이지 않는다 선택할 때
 int madongseok_action_choose; //마동석 액션 선택
 int before_madongseok_stamina; //바뀌기 전의 마동석 체력
-int madongseok_holding_zombie; //마동석이 좀비를 잡음
+int madongseok_holding_zombie = 0; //마동석이 좀비를 잡음
+int zombie_cant_move_right; //좀비가 마동석이 있음으로 오른쪽으로 이동이 불가능할 때
 
 //인트로 함수
 void intro() { 
@@ -92,14 +93,19 @@ int train(int ZOMB, int CITIZ, int MADONGS) {
 //좀비 움직이는 함수
 void zombie_move() {
 	if (turn % 2 != 0) { //턴이 짝수가 아닐 때
-		if (citizen_aggro >= madongseok_aggro) {
-			zombie--;
+		if (1 == madongseok_holding_zombie) {//좀비가 마동석한테 붙들려 있을 때
+			madongseok_holding_zombie = 1; 
 		}
 		else {
-			if (zombie + 1 == madongseok) {
-				madongseok_holding_zombie++; //좀비가 오른쪽으로 이동할 때, 마동석이 뒤에 있을 경우에 정지(마동석이 붙잡는거랑 같은 효과)
+			if (citizen_aggro >= madongseok_aggro) { //시민 어그로가 마동석 어그로보다 크거나 같을 때
+				zombie--;
 			}
-			else zombie++;
+			else {
+				if (zombie + 1 == madongseok) {
+					zombie_cant_move_right++; //좀비가 오른쪽으로 이동할 때, 마동석이 뒤에 있을 경우에 정지
+				}
+				else zombie++;
+			}
 		}
 	}
 	else zombie_cant_move++;
@@ -137,8 +143,7 @@ void madongseok_move_no_zombie() {
 				madongseok_aggro++; //어그로 1증가
 				if (madongseok_aggro > AGGRO_MAX) madongseok_aggro = AGGRO_MAX;
 				madongseok--; //한 칸 왼쪽으로 이동
-			}
-			else if (madongseok_choose == MOVE_STAY) { //이동안함 선택할 때
+			}else if (madongseok_choose == MOVE_STAY) { //이동안함 선택할 때
 				before_madongseok_aggro = madongseok_aggro;
 				madongseok_aggro--; //어그로 1감소
 				if (madongseok_aggro < AGGRO_MIN) madongseok_aggro = AGGRO_MIN;
@@ -198,17 +203,17 @@ void zombie_now() {
 	if (zombie_cant_move == 1) {
 		printf("zombie : STAY -> %d(Can't Move)\n", zombie);
 		zombie_cant_move = 0;
-	}
-	else if (madongseok_holding_zombie == 1) { //마동석에게 잡혀있을 때
-		printf("zombie : STAY -> %d\n", zombie);
+	}else if (madongseok_holding_zombie == 1) { 
+		printf("zombie : STAY -> %d(madongseok hold)\n", zombie); 
 		madongseok_holding_zombie = 0;
-	}
-	else {
+	}else if (zombie_cant_move_right == 1) {
+		printf("zombie : STAY -> %d(zombie can\'t move right)\n", zombie);
+		zombie_cant_move_right = 0;
+	}else {
 		// 좀비가 이동할 때
 		if (citizen_aggro < madongseok_aggro) {
 			printf("zombie : %d -> %d\n\n", zombie, zombie + 1);
-		}
-		else {
+		}else {
 			printf("zombie : %d -> %d\n\n", zombie + 1, zombie);
 			zombie_stay = 0;
 		}
@@ -297,12 +302,11 @@ void madongseok_result_pull() {
 			before_madongseok_stamina = madongseok_stamina;
 			madongseok_aggro += 2; //어그로 2 증가
 			madongseok_stamina -= 1; //체력 1 감소
-			madongseok_holding_zombie += 1; //좀비를 잡았다 신호 보내기
+			madongseok_holding_zombie = 1; //좀비를 잡았다 신호 보내기
 			if (madongseok_aggro > AGGRO_MAX) madongseok_aggro = AGGRO_MAX;
 			else if (madongseok_aggro < STM_MIN) madongseok_aggro = STM_MIN;
 			printf("madongseok: %d (aggro : %d -> %d, stamina : %d -> %d)\n\n", madongseok, before_madongseok_aggro, madongseok_aggro, before_madongseok_stamina, madongseok_stamina);
-		}
-		else { //붙들기 실패
+		}else { //붙들기 실패
 			printf("madongseok failed to pull zombie\n");
 			before_madongseok_aggro = madongseok_aggro;
 			before_madongseok_stamina = madongseok_stamina;
@@ -338,7 +342,7 @@ void zombie_action_attack_citizen() {
 	else if (zombie == madongseok - 1) {
 		madongseok_stamina--;
 		if (madongseok_stamina < STM_MIN) madongseok_stamina = STM_MIN;
-		printf("Zomibe attacked madongseok (stamina: %d -> %d)\n", madongseok_stamina + 1, madongseok_stamina);
+		printf("Zombie attacked madongseok (stamina: %d -> %d)\n", madongseok_stamina + 1, madongseok_stamina);
 		if (madongseok_stamina == 0) {
 			madongseok_stamina_zero();
 		}
@@ -421,15 +425,11 @@ int main (void) {
 		zombie_action_aggro_fight(); //좀비 행동(어그로 더 높은 쪽 공격 (시민 공격시 게임 끝, 마동석 공격시 STM 1감소))
 		zombie_action_attack_citizen(); //좀비 행동(시민을 물었을 때)
 		
-		
 		madongseok_action(); //마동석 액션
 		changing_the_line(); //줄 변경
 		madongseok_result_rest(); //마동석 휴식 액션 결과 출력
 		madongseok_result_provoke(); //마동석 도발 액션 결과 출력
 		madongseok_result_pull(); //마동석 좀비 붙들기 액션 결과 출력
-
-
-
 
 		madongseok_stamina_zero(); //마동석 체력이 0일 때
 	}
