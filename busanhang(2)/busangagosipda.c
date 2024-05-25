@@ -393,7 +393,7 @@ int main (void) {
 	charactor_position(zombie, citizen, madongseok);
 	first_train = train(zombie, citizen, madongseok); //기본열차 출력
 	changing_the_line();
-	while (turn < 20) { //반복 시작
+	while (1) { //반복 시작
 		turn++;//턴 증가
 
 		citizen_move(); //시민이동
