@@ -286,8 +286,7 @@ void madongseok_result_rest() {
 		if (madongseok_aggro != before_madongseok_aggro) {
 			printf("madongseok: %d (aggro: %d -> %d, stamina: %d -> %d)\n\n", madongseok, before_madongseok_aggro, madongseok_aggro, before_madongseok_stamina, madongseok_stamina);
 			madongseok_no_move = 0;
-		}
-		else if (madongseok_aggro == 0) {
+		}else if (madongseok_aggro == 0) {
 			if (madongseok_stamina > STM_MAX) madongseok_stamina = STM_MAX;
 			else if (madongseok_aggro < STM_MIN) madongseok_aggro = STM_MIN;
 			printf("madongseok: %d (aggro: %d, stamina: %d -> %d)\n\n", madongseok, madongseok_aggro, before_madongseok_stamina, madongseok_stamina);
@@ -299,7 +298,6 @@ void madongseok_result_provoke() {
 	if (madongseok_action_choose == ACTION_PROVOKE) {
 		printf("madongseok provoked zombie..\n");
 		before_madongseok_aggro = madongseok_aggro;
-		if (madongseok_aggro > AGGRO_MAX) madongseok_aggro = AGGRO_MAX;
 		madongseok_aggro = AGGRO_MAX;
 		printf("madongseok: %d (aggro: %d -> %d, stamina: %d)\n", madongseok, before_madongseok_aggro, madongseok_aggro, madongseok_stamina);
 	}
@@ -350,7 +348,7 @@ void zombie_action_nobody() {
 //좀비 주변에 시민 또는 마동석이 있을 때
 void zombie_action_attack_citizen() {
 	if (zombie_attack_of_madongseok == 1) {
-
+		zombie_attack_of_madongseok == 0;
 	}
 	else {
 		if (zombie == citizen + 1) {
