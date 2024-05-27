@@ -43,6 +43,7 @@ int madongseok_action_choose; //마동석 액션 선택
 int before_madongseok_stamina; //바뀌기 전의 마동석 체력
 int madongseok_holding_zombie = 0; //마동석이 좀비를 잡음
 int zombie_cant_move_right; //좀비가 마동석이 있음으로 오른쪽으로 이동이 불가능할 때
+int zombie_attack_of_madongseok; //좀비가 시민과 마동석 둘다 인접해있을 때 마동석을 때림
 
 //인트로 함수
 void intro() { 
@@ -340,15 +341,20 @@ void zombie_action_nobody() {
 
 //좀비 주변에 시민 또는 마동석이 있을 때
 void zombie_action_attack_citizen() {
-	if (zombie == citizen + 1) {
-		citizen_dead_ending();
+	if (zombie_attack_of_madongseok == 1) {
+
 	}
-	else if (zombie == madongseok - 1) {
-		madongseok_stamina--;
-		if (madongseok_stamina < STM_MIN) madongseok_stamina = STM_MIN;
-		printf("Zombie attacked madongseok (aggro: %d vs %d, madongseok stamina: %d -> %d)\n", citizen_aggro, madongseok_aggro, madongseok_stamina + 1, madongseok_stamina);
-		if (madongseok_stamina == 0) {
-			madongseok_stamina_zero();
+	else {
+		if (zombie == citizen + 1) {
+			citizen_dead_ending();
+		}
+		else if (zombie == madongseok - 1) {
+			madongseok_stamina--;
+			if (madongseok_stamina < STM_MIN) madongseok_stamina = STM_MIN;
+			printf("Zomibe attacked madongseok (stamina: %d -> %d)\n", madongseok_stamina + 1, madongseok_stamina);
+			if (madongseok_stamina == 0) {
+				madongseok_stamina_zero();
+			}
 		}
 	}
 }
@@ -357,14 +363,15 @@ void zombie_action_attack_citizen() {
 void zombie_action_aggro_fight() {
 	if (citizen + 1 == zombie && zombie + 1 == madongseok) {
 		if (citizen_aggro <= madongseok_aggro) {
+			zombie_attack_of_madongseok = 1;
 			madongseok_stamina--;
 			if (madongseok_stamina < STM_MIN) madongseok_stamina = STM_MIN;
-			printf("Zomibe attacked madongseok (stamina: %d -> %d)\n", madongseok_stamina + 1, madongseok_stamina);
+			printf("Zombie attacked madongseok (aggro: %d vs %d, madongseok stamina: %d -> %d)\n", citizen_aggro, madongseok_aggro, madongseok_stamina + 1, madongseok_stamina);
 			if (madongseok_stamina == 0) {
 				madongseok_stamina_zero();
 			}
 		}
-		else if (citizen_aggro > madongseok_aggro) {
+		else {
 			citizen_dead_ending();
 		}
 	}
