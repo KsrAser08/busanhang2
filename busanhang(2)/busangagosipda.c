@@ -346,7 +346,7 @@ void zombie_action_attack_citizen() {
 	else if (zombie == madongseok - 1) {
 		madongseok_stamina--;
 		if (madongseok_stamina < STM_MIN) madongseok_stamina = STM_MIN;
-		printf("Zombie attacked madongseok (stamina: %d -> %d)\n", madongseok_stamina + 1, madongseok_stamina);
+		printf("Zombie attacked madongseok (aggro: %d vs %d, madongseok stamina: %d -> %d)\n", citizen_aggro, madongseok_aggro, madongseok_stamina + 1, madongseok_stamina);
 		if (madongseok_stamina == 0) {
 			madongseok_stamina_zero();
 		}
