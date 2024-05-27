@@ -228,7 +228,7 @@ void madongseok_now(){
 	if (madongseok_no_move == 1) {
 		if (madongseok_aggro != before_madongseok_aggro) { //어그로가 이전과 다를 때
 			if (madongseok_stamina != before_madongseok_stamina) { //체력이 이전과 다를 때
-				printf("madongseok: stay %d (aggro: %d -> %d, stamina: %d -> %d)\n\n", madongseok, before_madongseok_aggro, madongseok_aggro, before_madongseok_stamina, madongseok_stamina);              ////////////////////////
+				printf("madongseok: stay %d (aggro: %d -> %d, stamina: %d -> %d)\n\n", madongseok, before_madongseok_aggro, madongseok_aggro, before_madongseok_stamina, madongseok_stamina); 
 				madongseok_no_move = 0;
 			}else {
 				printf("madongseok: stay %d (aggro: %d -> %d, stamina: %d)\n\n", madongseok, before_madongseok_aggro, madongseok_aggro, madongseok_stamina);
