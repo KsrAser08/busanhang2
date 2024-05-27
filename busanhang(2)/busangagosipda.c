@@ -154,8 +154,6 @@ void madongseok_move_no_zombie() {
 			madongseok_aggro--; //어그로 1감소
 			if (madongseok_aggro < AGGRO_MIN) madongseok_aggro = AGGRO_MIN;
 			before_madongseok_stamina = madongseok_stamina;
-			madongseok_stamina++; //체력 1증가   
-			if (madongseok_stamina > STM_MAX) madongseok_stamina = STM_MAX;
 			madongseok_no_move++; // 마동석 안움직임 신호
 		}
 	}
@@ -228,16 +226,11 @@ void madongseok_now(){
 	if (madongseok_no_move == 1) {
 		madongseok_choose = 0;
 		if (madongseok_aggro != before_madongseok_aggro) { //어그로가 이전과 다를 때
-			if (madongseok_stamina != before_madongseok_stamina) { //체력이 이전과 다를 때
-				printf("madongseok: stay %d (aggro: %d -> %d, stamina: %d -> %d)\n\n", madongseok, before_madongseok_aggro, madongseok_aggro, before_madongseok_stamina, madongseok_stamina); 
-				madongseok_no_move = 0;
-			}else {
-				printf("madongseok: stay %d (aggro: %d -> %d, stamina: %d)\n\n", madongseok, before_madongseok_aggro, madongseok_aggro, madongseok_stamina);
-				madongseok_no_move = 0;
-			}
-		} else if(madongseok_aggro == before_madongseok_aggro) {
-			if (before_madongseok_stamina != madongseok_stamina) printf("madongseok: stay %d (aggro: %d, stamina: %d -> %d)\n\n", madongseok, madongseok_aggro, before_madongseok_stamina,madongseok_stamina);
-			else printf("madongseok: stay %d (aggro: %d, stamina: %d)\n\n", madongseok, madongseok_aggro, madongseok_stamina);
+			printf("madongseok: stay %d (aggro: %d -> %d, stamina: %d)\n\n", madongseok, before_madongseok_aggro, madongseok_aggro, madongseok_stamina);
+			madongseok_no_move = 0;
+		} 
+		else if(madongseok_aggro == before_madongseok_aggro) {
+			printf("madongseok: stay %d (aggro: %d, stamina: %d)\n\n", madongseok, madongseok_aggro, madongseok_stamina);
 		}
 	}else if (madongseok_choose == MOVE_LEFT) {
 		madongseok_choose = 0;
@@ -348,7 +341,7 @@ void zombie_action_nobody() {
 //좀비 주변에 시민 또는 마동석이 있을 때
 void zombie_action_attack_citizen() {
 	if (zombie_attack_of_madongseok == 1) {
-		zombie_attack_of_madongseok == 0;
+
 	}
 	else {
 		if (zombie == citizen + 1) {
