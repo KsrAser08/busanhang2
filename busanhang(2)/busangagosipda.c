@@ -104,7 +104,10 @@ void zombie_move() {
 				if (zombie + 1 == madongseok) {
 					zombie_cant_move_right++; //좀비가 오른쪽으로 이동할 때, 마동석이 뒤에 있을 경우에 정지
 				}
-				else zombie++;
+				else {
+					zombie++; 
+					madongseok_holding_zombie = 0;
+				}
 			}
 		}
 	}
@@ -381,7 +384,12 @@ int citizen_dead_ending() {
 		exit(1);
 	}
 }
-
+//짝수턴 초기화 액션
+void madongseok_action_no_even_number() {
+	if (turn % 2 == 0) {
+		madongseok_holding_zombie = 0;
+	}
+}
 //줄바꾸기 함수
 void changing_the_line() {
 	printf("\n");
@@ -426,6 +434,7 @@ int main (void) {
 		zombie_action_attack_citizen(); //좀비 행동(시민을 물었을 때)
 		
 		madongseok_action(); //마동석 액션
+		madongseok_action_no_even_number(); //짝수 턴일 때 실행되면 안되는 것들 초기화
 		changing_the_line(); //줄 변경
 		madongseok_result_rest(); //마동석 휴식 액션 결과 출력
 		madongseok_result_provoke(); //마동석 도발 액션 결과 출력
