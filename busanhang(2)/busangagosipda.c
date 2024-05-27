@@ -328,6 +328,7 @@ int madongseok_stamina_zero(void) {
 		printf("GAME OVER\n");
 		exit(1);
 	}
+	return 0;
 }
 
 //좀비 주변에 아무도 없을 때
