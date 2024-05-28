@@ -387,6 +387,7 @@ int citizen_win() {
 //½Ã¹Î Á×À½
 int citizen_dead_ending() {
 	if (citizen + 1 == zombie) {
+		printf("zombie attacked the citizen.\n");
 		printf("\nGAME OEVER! citizen dead...\n");
 		exit(1);
 	}
