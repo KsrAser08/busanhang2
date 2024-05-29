@@ -46,7 +46,7 @@ int zombie_cant_move_right; //Á»ºñ°¡ ¸¶µ¿¼®ÀÌ ÀÖÀ½À¸·Î ¿À¸¥ÂÊÀ¸·Î ÀÌµ¿ÀÌ ºÒ°¡´ÉÇ
 int zombie_attack_of_madongseok; //Á»ºñ°¡ ½Ã¹Î°ú ¸¶µ¿¼® µÑ´Ù ÀÎÁ¢ÇØÀÖÀ» ¶§ ¸¶µ¿¼®À» ¶§¸²
 
 //ÀÎÆ®·Î ÇÔ¼ö
-void intro() { 
+void intro() {
 	printf(" ------------- busanhang(2) ------------- \n");
 	printf("|                                        |\n");
 	printf("|         We must run the train to       |\n");
@@ -56,7 +56,7 @@ void intro() {
 }
 
 //º¯¼ö ÀÔ·Â ÇÔ¼ö
-int variables(char*massage,int MIN, int MAX) {
+int variables(char* massage, int MIN, int MAX) {
 	int value;
 	while (1) {
 		printf("%s(%d ~ %d)>> ", massage, MIN, MAX);
@@ -65,7 +65,7 @@ int variables(char*massage,int MIN, int MAX) {
 			break;
 		}
 	}
-	 return value;
+	return value;
 }
 
 //Ä³¸¯ÅÍ À§Ä¡ ÁöÁ¤
@@ -95,7 +95,7 @@ int train(int ZOMB, int CITIZ, int MADONGS) {
 void zombie_move() {
 	if (turn % 2 != 0) { //ÅÏÀÌ Â¦¼ö°¡ ¾Æ´Ò ¶§
 		if (1 == madongseok_holding_zombie) {//Á»ºñ°¡ ¸¶µ¿¼®ÇÑÅ× ºÙµé·Á ÀÖÀ» ¶§
-			madongseok_holding_zombie = 1; 
+			madongseok_holding_zombie = 1;
 		}
 		else {
 			if (citizen_aggro >= madongseok_aggro) { //½Ã¹Î ¾î±×·Î°¡ ¸¶µ¿¼® ¾î±×·Îº¸´Ù Å©°Å³ª °°À» ¶§
@@ -106,7 +106,7 @@ void zombie_move() {
 					zombie_cant_move_right++; //Á»ºñ°¡ ¿À¸¥ÂÊÀ¸·Î ÀÌµ¿ÇÒ ¶§, ¸¶µ¿¼®ÀÌ µÚ¿¡ ÀÖÀ» °æ¿ì¿¡ Á¤Áö
 				}
 				else {
-					zombie++; 
+					zombie++;
 					madongseok_holding_zombie = 0;
 				}
 			}
@@ -149,7 +149,8 @@ void madongseok_move_no_zombie() {
 			madongseok_aggro++; //¾î±×·Î 1Áõ°¡
 			if (madongseok_aggro > AGGRO_MAX) madongseok_aggro = AGGRO_MAX;
 			madongseok--; //ÇÑ Ä­ ¿ÞÂÊÀ¸·Î ÀÌµ¿
-		}else if (madongseok_choose == MOVE_STAY) { //ÀÌµ¿¾ÈÇÔ ¼±ÅÃÇÒ ¶§
+		}
+		else if (madongseok_choose == MOVE_STAY) { //ÀÌµ¿¾ÈÇÔ ¼±ÅÃÇÒ ¶§
 			before_madongseok_aggro = madongseok_aggro;
 			madongseok_aggro--; //¾î±×·Î 1°¨¼Ò
 			if (madongseok_aggro < AGGRO_MIN) madongseok_aggro = AGGRO_MIN;
@@ -175,7 +176,7 @@ void madongseok_move_with_zombie() {
 			if (madongseok_stamina > STM_MAX) madongseok_stamina = STM_MAX;
 			madongseok_no_move++;
 		}
-		
+
 	}
 }
 //½Ã¹Î ÇöÀç »óÈ² Ãâ·Â
@@ -185,15 +186,17 @@ void citizen_now() {
 		if (citizen_aggro != before_citizen_aggro) {
 			printf("citizen: STAY -> %d (aggro: %d -> %d)\n", citizen, before_citizen_aggro, citizen_aggro);
 			citizen_stay = 0;
-		} 
-		else if(before_citizen_aggro == citizen_aggro) {
+		}
+		else if (before_citizen_aggro == citizen_aggro) {
 			printf("citizen: STAY -> %d (aggro: %d)\n", citizen, citizen_aggro);
 			citizen_stay = 0;
 		}
-	} else { //½Ã¹ÎÀÌ ¸ØÃçÀÖÁö ¾ÊÀ» ¶§
+	}
+	else { //½Ã¹ÎÀÌ ¸ØÃçÀÖÁö ¾ÊÀ» ¶§
 		if (citizen_aggro == before_citizen_aggro) {
 			printf("citizen: %d -> %d(aggro : %d)\n", citizen + 1, citizen, citizen_aggro);
-		} else {
+		}
+		else {
 			printf("citizen: %d -> %d(aggro : %d -> %d)\n", citizen + 1, citizen, before_citizen_aggro, citizen_aggro);
 			citizen_stay = 0;
 		}
@@ -205,38 +208,44 @@ void zombie_now() {
 	if (zombie_cant_move == 1) {
 		printf("zombie : STAY -> %d(Can't Move)\n", zombie);
 		zombie_cant_move = 0;
-	}else if (madongseok_holding_zombie == 1) { 
-		printf("zombie : STAY -> %d(madongseok hold)\n", zombie); 
+	}
+	else if (madongseok_holding_zombie == 1) {
+		printf("zombie : STAY -> %d(madongseok hold)\n", zombie);
 		madongseok_holding_zombie = 0;
-	}else if (zombie_cant_move_right == 1) {
+	}
+	else if (zombie_cant_move_right == 1) {
 		printf("zombie : STAY -> %d(zombie can\'t move right)\n", zombie);
 		zombie_cant_move_right = 0;
-	}else {
+	}
+	else {
 		// Á»ºñ°¡ ÀÌµ¿ÇÒ ¶§
 		if (citizen_aggro < madongseok_aggro) {
 			printf("zombie : %d -> %d\n\n", zombie, zombie + 1);
-		}else {
+		}
+		else {
 			printf("zombie : %d -> %d\n\n", zombie + 1, zombie);
 			zombie_stay = 0;
 		}
 	}
 }
 //¸¶µ¿¼® ÇöÀç»óÈ² Ãâ·Â
-void madongseok_now(){
+void madongseok_now() {
 	if (madongseok_no_move == 1) {
 		madongseok_choose = 0;
 		if (madongseok_aggro != before_madongseok_aggro) { //¾î±×·Î°¡ ÀÌÀü°ú ´Ù¸¦ ¶§
 			printf("madongseok: stay %d (aggro: %d -> %d, stamina: %d)\n\n", madongseok, before_madongseok_aggro, madongseok_aggro, madongseok_stamina);
 			madongseok_no_move = 0;
-		} 
-		else if(madongseok_aggro == before_madongseok_aggro) {
+		}
+		else if (madongseok_aggro == before_madongseok_aggro) {
 			printf("madongseok: stay %d (aggro: %d, stamina: %d)\n\n", madongseok, madongseok_aggro, madongseok_stamina);
 		}
-	}else if (madongseok_choose == MOVE_LEFT) {
+	}
+	else if (madongseok_choose == MOVE_LEFT) {
 		madongseok_choose = 0;
 		if (madongseok_aggro != before_madongseok_aggro) {
 			printf("madongseok: move %d -> %d (aggro: %d -> %d, stamina: %d)\n\n", madongseok + 1, madongseok, before_madongseok_aggro, madongseok_aggro, madongseok_stamina);
-		}else if (madongseok_aggro == before_madongseok_aggro) {
+		}
+		else if (madongseok_aggro == before_madongseok_aggro) {
 			printf("madongseok move: %d -> %d (aggro: %d, stamina: %d)\n\n", madongseok + 1, madongseok, madongseok_aggro, madongseok_stamina);
 		}
 	}
@@ -279,7 +288,8 @@ void madongseok_result_rest() {
 		if (madongseok_aggro != before_madongseok_aggro) {
 			printf("madongseok: %d (aggro: %d -> %d, stamina: %d -> %d)\n\n", madongseok, before_madongseok_aggro, madongseok_aggro, before_madongseok_stamina, madongseok_stamina);
 			madongseok_no_move = 0;
-		}else if (madongseok_aggro == 0) {
+		}
+		else if (madongseok_aggro == 0) {
 			if (madongseok_stamina > STM_MAX) madongseok_stamina = STM_MAX;
 			else if (madongseok_aggro < STM_MIN) madongseok_aggro = STM_MIN;
 			printf("madongseok: %d (aggro: %d, stamina: %d -> %d)\n\n", madongseok, madongseok_aggro, before_madongseok_stamina, madongseok_stamina);
@@ -403,7 +413,7 @@ void changing_the_line() {
 	printf("\n");
 }
 //¸ÞÀÎ ÇÔ¼ö
-int main (void) {
+int main(void) {
 	srand((unsigned int)time(NULL)); //³­¼ö ¼³Á¤
 	intro(); //ÀÎÆ®·Î Ãâ·Â
 	train_length = variables("train length", LEN_MIN, LEN_MAX); //¿­Â÷ ±æÀÌ ÀÔ·Â
@@ -440,7 +450,7 @@ int main (void) {
 		zombie_action_nobody(); //Á»ºñ Çàµ¿(ÁÖº¯ ¾Æ¹«µµ ¾øÀ»¶§)
 		zombie_action_aggro_fight(); //Á»ºñ Çàµ¿(¾î±×·Î ´õ ³ôÀº ÂÊ °ø°Ý (½Ã¹Î °ø°Ý½Ã °ÔÀÓ ³¡, ¸¶µ¿¼® °ø°Ý½Ã STM 1°¨¼Ò))
 		zombie_action_attack_citizen(); //Á»ºñ Çàµ¿(½Ã¹ÎÀ» ¹°¾úÀ» ¶§)
-		
+
 		madongseok_action(); //¸¶µ¿¼® ¾×¼Ç
 		madongseok_action_no_even_number(); //Â¦¼ö ÅÏÀÏ ¶§ ½ÇÇàµÇ¸é ¾ÈµÇ´Â °Íµé ÃÊ±âÈ­
 		changing_the_line(); //ÁÙ º¯°æ
