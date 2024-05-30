@@ -53,16 +53,13 @@ int round = 1;// 몇라운드인지 판단
 int before_citizen1_place, before_citizen2_place, before_citizen3_place; //시민들이 움직였나? 체크
 int citizen_die, citizen_left; //탈출 혹은 사망 정리
 int citizen_count = 3; //사람 수 카운트
-int citizen2_aggro, before_citizen2_aggro, citizen2_stay; //시민 2 관련 변수
-int citizen3_aggro, before_citizen3_aggro, citizen3_stay; //시민 3 관련 변수
+int citizen2_aggro = 1, before_citizen2_aggro, citizen2_stay; //시민 2 관련 변수
+int citizen3_aggro = 1, before_citizen3_aggro, citizen3_stay; //시민 3 관련 변수
 
 //함수 프로토타입
 void round1();
 void round2();
 void round3();
-void round4();
-
-
 
 //공통으로 사용되는 함수들
 
@@ -1581,13 +1578,7 @@ void changing_the_line_round3() {
 	printf("\n");
 }
 
-
-
-//부산헹 (3) 강화좀비 함수들
-
-
-
-// 부산헹 (2)의 함수들을 불러오는 함수
+// 부산헹 (2)의 함수들을 불러오는 함수 - STAGE 1
 void round1() {
 	changing_the_line();
 	charactor_position(zombie, citizen1, madongseok);
@@ -1630,7 +1621,7 @@ void round1() {
 	}
 }
 
-//부산헹 (3) 빌런 추가한 함수들을 불러오는 함수
+//부산헹 (3) 빌런 추가한 함수들을 불러오는 함수 - STAGE 2
 void round2() {
 	changing_the_line();
 	charactor_position_round2(zombie, citizen1, madongseok, villain);
@@ -1669,7 +1660,7 @@ void round2() {
 	}
 }
 
-//부산헹 (3) 시민'들'이 나오는 함수들을 불러오는 함수
+//부산헹 (3) 시민'들'이 나오는 함수들을 불러오는 함수 - STAGE 3
 void round3() {
 	changing_the_line_round3();
 	printf("\n\n");
@@ -1734,11 +1725,6 @@ void round3() {
 
 		madongseok_stamina_zero_round3(); //마동석 체력이 0일 때
 	}
-}
-
-//부산헹 (3) 강화 좀비가 나오는 함수들을 불러오는 함수
-void round4() {
-
 }
 
 //총 메인 함수

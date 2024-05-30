@@ -24,6 +24,7 @@
     <ProjectGuid>{0ec101f9-1847-4a1b-9720-e13fcee3ba7d}</ProjectGuid>
     <RootNamespace>busanhang2</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>busanhang(2), (3)</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
