@@ -55,11 +55,14 @@ int citizen_die, citizen_left; //탈출 혹은 사망 정리
 int citizen_count = 3; //사람 수 카운트
 int citizen2_aggro = 1, before_citizen2_aggro, citizen2_stay; //시민 2 관련 변수
 int citizen3_aggro = 1, before_citizen3_aggro, citizen3_stay; //시민 3 관련 변수
+int citizen1_zombie; citizen2_zombie; citizen3_zombie; //시민1,2,3이 좀비로 변함
+int before_zombie_line; //좀비 이전 위치
 
 //함수 프로토타입
 void round1();
 void round2();
 void round3();
+void round4();
 
 //공통으로 사용되는 함수들
 
@@ -120,9 +123,15 @@ void changing_the_line() {
 void game_reset() {
 	before_citizen1_aggro = 1;
 	citizen1_aggro = 1;
+	before_citizen2_aggro = 1;
+	citizen2_aggro = 1;
+	before_citizen3_aggro = 1;
+	citizen3_aggro = 1;
 	before_madongseok_aggro = 1;
 	madongseok_aggro = 1;
+	citizen_count = 3;
 	madongseok_stamina = madongseok_stamina_get;
+	madongseok_holding_zombie = 0;
 	turn = 0;
 }
 
@@ -806,8 +815,10 @@ int madongseok_stamina_zero_round2(void) {
 	if (madongseok_stamina == 0) {
 		printf("madongseok's stamina is 0\n");
 		printf("GAME OVER\n");
+		game_reset();
+		round3();
 	}
-	round = 3;
+	
 }
 
 //좀비 주변에 아무도 없을 때 2
@@ -919,6 +930,7 @@ int citizen_win_round2() {
 		villain = -1;
 	}
 }
+
 
 
 //부산헹(3) 시민'들' 함수
@@ -1404,7 +1416,8 @@ int madongseok_stamina_zero_round3(void) {
 	if (madongseok_stamina == 0) {
 		printf("madongseok's stamina is 0\n");
 		printf("GAME OVER\n");
-		exit(1);
+		game_reset();
+		round4();
 	}
 	return 0;
 }
@@ -1471,7 +1484,7 @@ void zombie_action_aggro_fight_round3() {
 			citizen_die++;
 			citizen_count--;
 			printf("citizen1 has been attacked by zombie.\n");
-			printf("%d citizen(s) alive(s).", citizen_count);
+			printf("%d citizen(s) alive(s).\n", citizen_count);
 		}
 	}
 	else if (citizen2 + 1 == zombie && zombie + 1 == madongseok) {
@@ -1488,7 +1501,7 @@ void zombie_action_aggro_fight_round3() {
 			citizen2 = -1;
 			citizen_count--;
 			printf("citizen2 has been attacked by zombie.\n");
-			printf("%d citizen(s) alive(s).", citizen_count);
+			printf("%d citizen(s) alive(s).\n", citizen_count);
 		}
 	}
 	else if (citizen3 + 1 == zombie && zombie + 1 == madongseok) {
@@ -1506,7 +1519,7 @@ void zombie_action_aggro_fight_round3() {
 			citizen_die++;
 			citizen_count--;
 			printf("citizen3 has been attacked by zombie.\n");
-			printf("%d citizen(s) alive(s).", citizen_count);
+			printf("%d citizen(s) alive(s).\n", citizen_count);
 		}
 	}
 }
@@ -1552,16 +1565,18 @@ void citizens_left_round3() {
 	if (citizen_count == 0 && citizen_left >= 1) {
 		printf("citizen(s) left\n");
 		printf("YOU WIN!\n");
-		exit(1);
+		game_reset();
+		round4();
 	}
-}                    //exit 빼고 라운드 바꿔야함          
+}                       
 
 //시민 모두 사망 3
 void citizens_die_round3() {
 	if (citizen_count == 0 && citizen_left == 0) {
 		printf("citizens all die\n");
 		printf("YOU LOSE...\n");
-		exit(1);
+		game_reset();
+		round4();
 	}
 }                         //exit 빼고 라운드 바꿔야함
 
@@ -1576,6 +1591,762 @@ void madongseok_action_no_even_number_round3() {
 void changing_the_line_round3() {
 	printf("\n");
 }
+
+
+
+//부산헹(3) 강화 좀비 함수들
+
+
+// 시민2, 시민3 위치지정 4
+void citizens_line_round4() {
+	while (1) {
+		citizen2 = rand() % train_length / 2;
+		citizen3 = rand() % train_length / 4;
+		if (citizen2 != 0 && citizen3 != 0 && citizen2 != citizen3 && citizen2 > citizen3) {
+			break;
+		}
+	}
+
+}
+
+//캐릭터 위치 지정 4
+int charactor_position_round4() {
+	citizen1 = train_length - 6;
+	zombie = train_length - 3;
+	madongseok = train_length - 2;
+}
+
+//열차 함수 4
+int train_round4(int ZOMB, int CITIZ1, int CITIZ2, int CITIZ3, int MADONGS) {
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < train_length; j++) {
+			if (i == 0 || i == 2) printf("#");
+			else {
+				if ((j == 0) || (j == train_length - 1)) printf("#");
+				else if (MADONGS == j) printf("M");
+				else if (ZOMB == j) printf("Z");
+				else if (CITIZ1 == j) {
+					if (citizen1_zombie == 1) {
+						printf("Z");
+					}
+					else {
+						printf("C");
+					}
+				}
+				else if (CITIZ2 == j) {
+					if (citizen2_zombie == 1) {
+						printf("Z");
+					}
+					else {
+						printf("C");
+					}
+				}
+				else if (CITIZ3 == j) {
+					if (citizen3_zombie == 1) {
+						printf("Z");
+					}
+					else {
+						printf("C");
+					}
+				}
+				else printf(" ");
+			}
+		}
+		printf("\n");
+	}
+}
+
+//좀비 움직이는 함수 4
+void zombie_move_round4() {
+	if (turn % 2 != 0) { //턴이 짝수가 아닐 때
+		if ((citizen1_aggro < madongseok_aggro && citizen2_aggro < madongseok_aggro && citizen3_aggro < madongseok_aggro) && zombie + 1 == madongseok) {
+			zombie_cant_move_right = 1;
+		}
+		if (1 == madongseok_holding_zombie) {//좀비가 마동석한테 붙들려 있을 때
+			madongseok_holding_zombie++;
+		}
+		if (1 != madongseok_holding_zombie) {
+			if (citizen1_aggro >= madongseok_aggro || citizen2_aggro >= madongseok_aggro || citizen3_aggro >= madongseok_aggro) { //시민 어그로가 마동석 어그로보다 크거나 같을 때
+				before_zombie_line = zombie;
+				zombie--;
+			}
+			else if (zombie + 1 == madongseok) {
+				zombie_cant_move_right = 1; //좀비가 오른쪽으로 이동할 때, 마동석이 뒤에 있을 경우에 정지
+			}
+			else {
+				zombie++;
+				madongseok_holding_zombie = 0;
+			}
+
+		}
+	}
+	else zombie_cant_move++;
+}
+
+//시민1 움직이는 함수 4
+void citizen1_move_round4() {
+	citizen_random = rand() % 101;
+	if (citizen1_zombie != 1) {
+		if ((100 - percentile_probability) >= citizen_random) { //이동에 성공
+			if (citizen1 != 1 && citizen1 != citizen2 + 1) {
+				before_citizen1_place = citizen1;
+				citizen1--;
+				before_citizen1_aggro = citizen1_aggro;
+				citizen1_aggro++;
+				if (citizen1_aggro > AGGRO_MAX) {
+					citizen1_aggro = AGGRO_MAX;
+				}
+			}
+			else {
+				citizen1_stay++;
+			}
+		}
+		else { //이동 실패
+			before_citizen1_place = citizen1;
+			citizen1_stay++;
+			before_citizen1_aggro = citizen1_aggro;
+			citizen1_aggro--;
+			if (citizen1_aggro < AGGRO_MIN) {
+				citizen1_aggro = AGGRO_MIN;
+			}
+		}
+	}
+	if (citizen1_zombie == 1) {
+		if (citizen2_aggro >= madongseok_aggro || citizen3_aggro >= madongseok_aggro) { //남은 두 시민 어그로가 마동석보다 크거나 같을때
+			if (citizen2 + 1 == citizen1 || citizen3 + 1 == citizen1) {
+				citizen1_stay = 1;
+			}
+			else {
+				before_citizen1_place = citizen1;
+				citizen1--;
+			}
+		}
+		else {
+			citizen1++;
+		}
+	}
+}
+
+//시민2 움직이는 함수 4
+void citizen2_move_round4() {
+	citizen_random = rand() % 101;
+	if (citizen2_zombie != 1) {
+		if (citizen2 != 1) {
+			if (citizen1 + 1 == citizen2 || citizen3 + 1 == citizen2) {
+				citizen2_stay = 1;
+			}
+			else {
+				if ((100 - percentile_probability) >= citizen_random) { //이동에 성공
+					if (citizen2 != citizen3 + 1) {
+						before_citizen2_place = citizen2;
+						citizen2--;
+						before_citizen2_aggro = citizen2_aggro;
+						citizen2_aggro++;
+						if (citizen2_aggro > AGGRO_MAX) {
+							citizen2_aggro = AGGRO_MAX;
+						}
+					}
+				}
+				else { //이동 실패
+					before_citizen2_place = citizen2;
+					citizen2_stay = 1;
+					before_citizen2_aggro = citizen2_aggro;
+					citizen2_aggro--;
+					if (citizen2_aggro < AGGRO_MIN) {
+						citizen2_aggro = AGGRO_MIN;
+					}
+				}
+			}
+		}
+		else if (citizen2 == 1) {
+			before_citizen2_place = citizen2;
+		}
+		else if (citizen2 == -1) {
+			citizen2 = -1;
+		}
+	}
+	if (citizen2_zombie == 1) {
+		if (citizen3_aggro >= madongseok_aggro) {
+			if (citizen3 + 1 == citizen2) {
+				citizen1_stay = 1;
+			}
+			else {
+				before_citizen2_place = citizen2;
+				citizen2--;
+			}
+		}
+		else {
+			citizen2++;
+		}
+	}
+}
+
+//시민3 움직이는 함수 4
+void citizen3_move_round4() {
+	citizen_random = rand() % 101;
+	if (citizen3_zombie != 1) {
+		if (citizen3 != 1) {
+			if (citizen1 + 1 == citizen3 || citizen2 + 1 == citizen3) {
+				citizen3_stay = 1;
+			}
+			else {
+				if ((100 - percentile_probability) >= citizen_random) { //이동에 성공
+					before_citizen3_place = citizen3;
+					citizen3--;
+					before_citizen3_aggro = citizen3_aggro;
+					citizen3_aggro + 1;
+					if (citizen3_aggro > AGGRO_MAX) {
+						citizen3_aggro = AGGRO_MAX;
+					}
+				}
+				else { //이동 실패
+					before_citizen3_place = citizen3;
+					citizen3_stay = 1;
+					before_citizen3_aggro = citizen3_aggro;
+					citizen3_aggro - 1;
+					if (citizen3_aggro < AGGRO_MIN) {
+						citizen3_aggro = AGGRO_MIN;
+					}
+				}
+			}
+		}
+		else if (citizen3 == 1) {
+			before_citizen3_place = citizen3;
+		}
+		else if (citizen3 == -1) {
+			citizen3 = -1;
+		}
+	}
+	if (citizen3_zombie == 1) {
+		//엔딩 출력
+	}
+}
+
+//좀비가 바로 앞에 없을 때 마동석 이동 4
+void madongseok_move_no_zombie_round4() {
+	if (zombie != madongseok - 1) {
+		while (1) {
+			printf("madongseok move(%d:stay, %d:left)>> ", MOVE_STAY, MOVE_LEFT); //앞에 좀비가 없을 때
+			scanf_s("%d", &madongseok_choose);
+			if (madongseok_choose == MOVE_STAY || madongseok_choose == MOVE_LEFT) break;
+		}
+		if (madongseok_choose == MOVE_LEFT) { //이동함 선택할 때
+			before_madongseok_aggro = madongseok_aggro;
+			madongseok_aggro++; //어그로 1증가
+			if (madongseok_aggro > AGGRO_MAX) madongseok_aggro = AGGRO_MAX;
+			madongseok--; //한 칸 왼쪽으로 이동
+		}
+		else if (madongseok_choose == MOVE_STAY) { //이동안함 선택할 때
+			before_madongseok_aggro = madongseok_aggro;
+			madongseok_aggro--; //어그로 1감소
+			if (madongseok_aggro < AGGRO_MIN) madongseok_aggro = AGGRO_MIN;
+			before_madongseok_stamina = madongseok_stamina;
+			madongseok_no_move++; // 마동석 안움직임 신호
+		}
+	}
+}
+
+//좀비가 바로 앞에 있을때 마동석 이동 4
+void madongseok_move_with_zombie_round4() {
+	if (zombie == madongseok - 1) { //좀비가 바로 앞에 있을 경우
+		while (1) {
+			printf("madongseok move(%d:stay)>> ", MOVE_STAY);
+			scanf_s("%d", &madongseok_choose);
+			if (madongseok_choose == MOVE_STAY) break;
+		}
+		if (madongseok_choose == MOVE_STAY) { //이동안함 선택할 때
+			before_madongseok_aggro = madongseok_aggro;
+			madongseok_aggro--; //어그로 1감소
+			if (madongseok_aggro < AGGRO_MIN) madongseok_aggro = AGGRO_MIN;
+			before_madongseok_stamina = madongseok_stamina;
+			madongseok_stamina++; //체력 1증가   
+			if (madongseok_stamina > STM_MAX) madongseok_stamina = STM_MAX;
+			madongseok_no_move++;
+		}
+
+	}
+}
+
+
+
+//시민1 현재 상황 출력 4
+void citizen1_now_round4() {
+	if (before_citizen1_place == citizen1) {
+		printf("citizen 1: STAY -> %d (aggro: %d -> %d)\n", citizen1, before_citizen1_aggro, citizen1_aggro);
+	}
+	else if (before_citizen1_place != citizen1) {
+		printf("citizen 1: %d -> %d(aggro : %d -> %d)\n", citizen1 + 1, citizen1, before_citizen1_aggro, citizen1_aggro);
+	}
+	else {
+		if (citizen1_stay == 1) { //시민이 멈춰있을때
+			if (citizen1_aggro != before_citizen1_aggro) {
+				printf("citizen 1: STAY -> %d (aggro: %d -> %d)\n", citizen1, before_citizen1_aggro, citizen1_aggro);
+				citizen1_stay = 0;
+			}
+			else if (before_citizen1_aggro == citizen1_aggro) {
+				printf("citizen 1: STAY -> %d (aggro: %d)\n", citizen1, citizen1_aggro);
+				citizen1_stay = 0;
+			}
+		}
+		else { //시민이 멈춰있지 않을 때
+			if (citizen1_aggro == before_citizen1_aggro) {
+				printf("citizen 1: %d -> %d(aggro : %d)\n", citizen1 + 1, citizen1, citizen1_aggro);
+				citizen1_stay = 0;
+			}
+			else {
+				printf("citizen 1: %d -> %d(aggro : %d -> %d)\n", citizen1 + 1, citizen1, before_citizen1_aggro, citizen1_aggro);
+				citizen1_stay = 0;
+			}
+		}
+	}
+}
+
+//시민2 현재 상황 출력 4
+void citizen2_now_round4() {
+	if (citizen2 == -1) {
+		printf("citizen2 is free!\n");
+	}
+	else if (before_citizen2_place == citizen2) {
+		citizen2_stay = 0;
+		if (citizen2_aggro < AGGRO_MIN) {
+			citizen2_aggro = AGGRO_MIN;
+		}
+		printf("citizen 2: STAY -> %d (aggro: %d -> %d)\n", citizen2, before_citizen2_aggro, citizen2_aggro);
+	}
+	else if (before_citizen2_place != citizen2) {
+		printf("citizen 2: %d -> %d(aggro : %d -> %d)\n", citizen2 + 1, citizen2, before_citizen2_aggro, citizen2_aggro);
+	}
+	else {
+		if (citizen2_stay == 1) { //시민이 멈춰있을때
+			if (citizen2_aggro != before_citizen2_aggro) {
+				printf("citizen 2: STAY -> %d (aggro: %d -> %d)\n", citizen2, before_citizen2_aggro, citizen2_aggro);
+				citizen3_stay = 0;
+			}
+		}
+		else { //시민이 멈춰있지 않을 때
+			if (citizen2_aggro == before_citizen2_aggro) {
+				printf("citizen 2: %d -> %d(aggro : %d)\n", citizen2 + 1, citizen2, citizen2_aggro);
+				citizen3_stay = 0;
+			}
+			else {
+				printf("citizen 2: %d -> %d(aggro : %d -> %d)\n", citizen2 + 1, citizen2, before_citizen2_aggro, citizen2_aggro);
+				citizen2_stay = 0;
+			}
+		}
+	}
+}
+
+//시민3 현재 상황 출력 4
+void citizen3_now_round4() {
+	if (citizen3 == -1) {
+		printf("citizen3 is free!\n");
+	}
+	else if (before_citizen3_place == citizen3) {
+		before_citizen3_aggro = citizen3_aggro;
+		citizen3_aggro--;
+		if (citizen3_aggro < AGGRO_MIN) {
+			citizen3_aggro = AGGRO_MIN;
+		}
+		printf("citizen 3: STAY -> %d (aggro: %d -> %d)\n", citizen3, before_citizen3_aggro, citizen3_aggro);
+	}
+	else if (before_citizen3_place != citizen3) {
+		printf("citizen 3: %d -> %d(aggro : %d -> %d)\n", citizen3 + 1, citizen3, before_citizen3_aggro, citizen3_aggro);
+	}
+	else {
+		if (citizen3_stay == 1) { //시민이 멈춰있을때
+			if (citizen3_aggro != before_citizen3_aggro) {
+				printf("citizen 3: STAY -> %d (aggro: %d -> %d)\n", citizen3, before_citizen3_aggro, citizen3_aggro);
+				citizen3_stay = 0;
+			}
+			else if (before_citizen3_aggro == citizen3_aggro) {
+				printf("citizen 3: STAY -> %d (aggro: %d)\n", citizen3, citizen3_aggro);
+				citizen3_stay = 0;
+			}
+		}
+		else { //시민이 멈춰있지 않을 때
+			if (citizen3_aggro == before_citizen3_aggro) {
+				printf("citizen 3: %d -> %d(aggro : %d)\n", citizen3 + 1, citizen3, citizen3_aggro);
+				citizen3_stay = 0;
+			}
+			else {
+				printf("citizen 3: %d -> %d(aggro : %d -> %d)\n", citizen3 + 1, citizen3, before_citizen3_aggro, citizen3_aggro);
+				citizen3_stay = 0;
+			}
+		}
+	}
+}
+
+//좀비 현재상황 출력 4
+void zombie_now_round4() {
+	//좀비가 이동할 수 없는 턴일 때
+	if (zombie_cant_move_right == 1) {
+		printf("zombie : STAY -> %d(zombie can\'t move right)\n", zombie);
+		zombie_cant_move_right = 0;
+	}
+	else if (zombie_cant_move == 1) {
+		printf("zombie : STAY -> %d(Can't Move)\n", zombie);
+		zombie_cant_move = 0;
+	}
+	else if (madongseok_holding_zombie == 1) {
+		printf("zombie : STAY -> %d(madongseok hold)\n", zombie);
+		madongseok_holding_zombie = 0;
+	}
+	else {
+		// 좀비가 이동할 때
+		if (before_zombie_line != zombie) {
+			printf("zombie : %d -> %d\n\n", before_zombie_line, zombie);
+		}
+		else {
+			printf("zombie : %d -> %d\n\n", zombie, before_zombie_line);
+			zombie_stay = 0;
+		}
+	}
+}
+
+//마동석 현재상황 출력 4
+void madongseok_now_round4() {
+	if (madongseok_no_move == 1) {
+		madongseok_choose = 0;
+		if (madongseok_aggro != before_madongseok_aggro) { //어그로가 이전과 다를 때
+			printf("madongseok: stay %d (aggro: %d -> %d, stamina: %d)\n\n", madongseok, before_madongseok_aggro, madongseok_aggro, madongseok_stamina);
+			madongseok_no_move = 0;
+		}
+		else if (madongseok_aggro == before_madongseok_aggro) {
+			printf("madongseok: stay %d (aggro: %d, stamina: %d)\n\n", madongseok, madongseok_aggro, madongseok_stamina);
+		}
+	}
+	else if (madongseok_choose == MOVE_LEFT) {
+		madongseok_choose = 0;
+		if (madongseok_aggro != before_madongseok_aggro) {
+			printf("madongseok: move %d -> %d (aggro: %d -> %d, stamina: %d)\n\n", madongseok + 1, madongseok, before_madongseok_aggro, madongseok_aggro, madongseok_stamina);
+		}
+		else if (madongseok_aggro == before_madongseok_aggro) {
+			printf("madongseok move: %d -> %d (aggro: %d, stamina: %d)\n\n", madongseok + 1, madongseok, madongseok_aggro, madongseok_stamina);
+		}
+	}
+}
+
+//시민1 액션 없을 때 4
+void result1_round4() {
+	if (citizen1 != -1) {
+		if (citizen1 != 1) {
+			printf("citizen1 does nothing.\n");
+		}
+	}
+}
+
+//시민2 액션 없을 때 4
+void result2_round4() {
+	if (citizen2 != -1) {
+		if (citizen2 != 1) {
+			printf("citizen2 does nothing.\n");
+		}
+	}
+}
+
+//시민1 액션 없을 때 4
+void result3_round4() {
+	if (citizen3 != -1) {
+		if (citizen3 != 1) {
+			printf("citizen3 does nothing.\n");
+		}
+	}
+}
+
+//마동석 액션 4
+void madongseok_action_round4() {
+	if (madongseok - 1 == zombie) {
+		while (1) {
+			printf("madongseok action (%d.rest, %d.provoke, %d.pull)>> ", ACTION_REST, ACTION_PROVOKE, ACTION_PULL);
+			scanf_s("%d", &madongseok_action_choose);
+			if (madongseok_action_choose == ACTION_REST || madongseok_action_choose == ACTION_PROVOKE || madongseok_action_choose == ACTION_PULL) break;
+		}
+	}
+	else {
+		while (1) {
+			printf("madongseok action (%d.rest, %d.provoke)>> ", ACTION_REST, ACTION_PROVOKE);
+			scanf_s("%d", &madongseok_action_choose);
+			if (madongseok_action_choose == ACTION_REST || madongseok_action_choose == ACTION_PROVOKE) break;
+		}
+	}
+}
+
+//마동석 휴식 행동 결과 4
+void madongseok_result_rest_round4() {
+	if (madongseok_action_choose == ACTION_REST) {
+		printf("madongseok rests...\n");
+		before_madongseok_aggro = madongseok_aggro;
+		before_madongseok_stamina = madongseok_stamina;
+		madongseok_aggro--;
+		madongseok_stamina++;
+		if (madongseok_aggro > AGGRO_MAX) madongseok_aggro = AGGRO_MAX;
+		else if (madongseok_aggro < AGGRO_MIN) madongseok_aggro = AGGRO_MIN;
+		else if (madongseok_stamina > STM_MAX) madongseok_stamina = STM_MAX;
+		else if (madongseok_aggro < STM_MIN) madongseok_aggro = STM_MIN;
+		if (madongseok_aggro != before_madongseok_aggro) {
+			printf("madongseok: %d (aggro: %d -> %d, stamina: %d -> %d)\n\n", madongseok, before_madongseok_aggro, madongseok_aggro, before_madongseok_stamina, madongseok_stamina);
+			madongseok_no_move = 0;
+		}
+		else if (madongseok_aggro == 0) {
+			if (madongseok_stamina > STM_MAX) madongseok_stamina = STM_MAX;
+			else if (madongseok_aggro < STM_MIN) madongseok_aggro = STM_MIN;
+			printf("madongseok: %d (aggro: %d, stamina: %d -> %d)\n\n", madongseok, madongseok_aggro, before_madongseok_stamina, madongseok_stamina);
+		}
+	}
+}
+
+//마동석 도발 행동 결과 4
+void madongseok_result_provoke_round4() {
+	if (madongseok_action_choose == ACTION_PROVOKE) {
+		printf("madongseok provoked zombie..\n");
+		before_madongseok_aggro = madongseok_aggro;
+		madongseok_aggro = AGGRO_MAX;
+		printf("madongseok: %d (aggro: %d -> %d, stamina: %d)\n", madongseok, before_madongseok_aggro, madongseok_aggro, madongseok_stamina);
+	}
+}
+
+// 마동석 붙들기 행동 결과 4
+void madongseok_result_pull_round4() {
+	madongseok_random = rand() % 101;
+	if (madongseok_action_choose == ACTION_PULL) {
+		if ((100 - percentile_probability) > madongseok_random) { //붙들기 성공
+			printf("madongseok pulled zombie... Next turn, it can't move\n");
+			before_madongseok_aggro = madongseok_aggro;
+			before_madongseok_stamina = madongseok_stamina;
+			madongseok_aggro += 2; //어그로 2 증가
+			madongseok_stamina -= 1; //체력 1 감소
+			madongseok_holding_zombie = 1; //좀비를 잡았다 신호 보내기
+			if (madongseok_aggro > AGGRO_MAX) madongseok_aggro = AGGRO_MAX;
+			else if (madongseok_aggro < STM_MIN) madongseok_aggro = STM_MIN;
+			printf("madongseok: %d (aggro : %d -> %d, stamina : %d -> %d)\n\n", madongseok, before_madongseok_aggro, madongseok_aggro, before_madongseok_stamina, madongseok_stamina);
+		}
+		else { //붙들기 실패
+			printf("madongseok failed to pull zombie\n");
+			before_madongseok_aggro = madongseok_aggro;
+			before_madongseok_stamina = madongseok_stamina;
+			madongseok_aggro += 2; //어그로 2 증가
+			madongseok_stamina -= 1; //체력 1 감소
+			if (madongseok_aggro > AGGRO_MAX) madongseok_aggro = AGGRO_MAX;
+			else if (madongseok_aggro < STM_MIN) madongseok_aggro = STM_MIN;
+			printf("madongseok: %d (aggro : %d -> %d, stamina : %d -> %d)\n\n", madongseok, before_madongseok_aggro, madongseok_aggro, before_madongseok_stamina, madongseok_stamina);
+		}
+	}
+}
+
+//마동석 체력이 0일때 판단 4
+int madongseok_stamina_zero_round4(void) {
+	if (madongseok_stamina == 0) {
+		printf("madongseok's stamina is 0\n");
+		printf("GAME OVER\n");
+		exit(1);
+	}
+	return 0;
+}
+
+//좀비 주변에 아무도 없을 때 4
+void zombie_action_nobody_round4() {
+	if (zombie != madongseok - 1 && zombie != citizen1 + 1 && zombie != citizen2 + 1 && zombie != citizen3 + 1) {
+		printf("zombie attacked nobody.\n\n");
+	}
+}
+
+//좀비 주변에 시민(들)또는 마동석이 있을 때 4
+void zombie_action_attack_citizen_round4() {
+	if (zombie_attack_of_madongseok == 1) {
+
+	}
+	else {
+		if (zombie == citizen1 + 1) {
+			citizen_count--;
+			citizen1_zombie = 1;
+			printf("ciziten1 turned into a zombie!\n");
+			printf("%d citizen(s) alive(s).\n", citizen_count);
+		}
+		if (zombie == citizen2 + 1) {
+			citizen_count--;
+			citizen2_zombie = 1;
+			printf("ciziten2 turned into a zombie!\n");
+			printf("%d citizen(s) alive(s).\n", citizen_count);
+		}
+		if (zombie == citizen3 + 1) {
+			citizen_count--;
+			citizen3_zombie = 1;
+			printf("ciziten3 turned into a zombie!\n");
+			printf("%d citizen(s) alive(s).\n", citizen_count);
+		}
+		else if (zombie == madongseok - 1) {
+			madongseok_stamina--;
+			if (madongseok_stamina < STM_MIN) madongseok_stamina = STM_MIN;
+			printf("Zomibe attacked madongseok (stamina: %d -> %d)\n", madongseok_stamina + 1, madongseok_stamina);
+			if (madongseok_stamina == 0) {
+				madongseok_stamina_zero_round4();
+			}
+		}
+	}
+}
+
+//좀비 주변에 둘 다 있을 때 어그로 비교 및 공격 4
+void zombie_action_aggro_fight_round4() {
+	if (citizen1 + 1 == zombie && zombie + 1 == madongseok) {
+		if (citizen1_aggro <= madongseok_aggro) {
+			zombie_attack_of_madongseok = 1;
+			madongseok_stamina--;
+			if (madongseok_stamina < STM_MIN) madongseok_stamina = STM_MIN;
+			printf("Zombie attacked madongseok (aggro: %d vs %d, madongseok stamina: %d -> %d)\n", citizen1_aggro, madongseok_aggro, madongseok_stamina + 1, madongseok_stamina);
+			if (madongseok_stamina == 0) {
+				madongseok_stamina_zero_round4();
+			}
+		}
+		else {
+			citizen1_zombie = 1;
+			citizen_count--;
+			printf("citizen1 has been attacked by zombie.\n");
+			printf("%d citizen(s) alive(s).", citizen_count);
+
+		}
+	}
+	else if (citizen2 + 1 == zombie && zombie + 1 == madongseok) {
+		if (citizen2_aggro <= madongseok_aggro) {
+			zombie_attack_of_madongseok = 1;
+			madongseok_stamina--;
+			if (madongseok_stamina < STM_MIN) madongseok_stamina = STM_MIN;
+			printf("Zombie attacked madongseok (aggro: %d vs %d, madongseok stamina: %d -> %d)\n", citizen2_aggro, madongseok_aggro, madongseok_stamina + 1, madongseok_stamina);
+			if (madongseok_stamina == 0) {
+				madongseok_stamina_zero_round4();
+			}
+		}
+		else {
+			citizen2_zombie = 1;
+			citizen_count--;
+			printf("citizen2 has been attacked by zombie.\n");
+			printf("%d citizen(s) alive(s).", citizen_count);
+
+		}
+	}
+	else if (citizen3 + 1 == zombie && zombie + 1 == madongseok) {
+		if (citizen3_aggro <= madongseok_aggro) {
+			zombie_attack_of_madongseok = 1;
+			madongseok_stamina--;
+			if (madongseok_stamina < STM_MIN) madongseok_stamina = STM_MIN;
+			printf("Zombie attacked madongseok (aggro: %d vs %d, madongseok stamina: %d -> %d)\n", citizen3_aggro, madongseok_aggro, madongseok_stamina + 1, madongseok_stamina);
+			if (madongseok_stamina == 0) {
+				madongseok_stamina_zero_round4();
+			}
+		}
+		else {
+			citizen3_zombie = 1;
+			citizen_count--;
+			printf("citizen3 has been attacked by zombie.\n");
+			printf("%d citizen(s) alive(s).", citizen_count);
+
+		}
+	}
+}
+
+//시민1 탈출성공 4
+int citizen1_win_round4() {
+	if (citizen1 == 1) {
+		printf("citizen1 succeeded in escaping\n");
+		citizen_left++;
+		citizen_count--;
+		citizen1 = -1;
+		printf("%d citizen(s) alive(s)..\n", citizen_count);
+
+	}
+}
+
+//시민 2 탈출성공 4
+int citizen2_win_round4() {
+	if (citizen2 == 1) {
+		printf("citizen2 succeeded in escaping\n");
+		citizen_count--;
+		citizen_left++;
+		citizen2 = -1;
+		printf("%d citizen(s) alive(s)..\n", citizen_count);
+
+	}
+}
+
+//시민 3 탈출성공 4
+int citizen3_win_round4() {
+	if (citizen3 == 1) {
+		printf("citizen3 succeeded in escaping\n");
+		citizen_count--;
+		citizen_left++;
+		citizen3 = -1;
+		printf("%d citizen(s) alive(s)..\n", citizen_count);
+
+	}
+}
+
+//시민 한 명이라도 탈출 4
+void citizens_left_round4() {
+	if (citizen_count == 0 && citizen_left >= 1) {
+		printf("citizen(s) left\n");
+		printf("YOU WIN!");
+		exit(1);
+	}
+}
+
+//시민 모두 사망 4
+void citizens_die_round4() {
+	if (citizen_count == 0 && citizen_left == 0) {
+		printf("citizens all die\n");
+		printf("YOU LOSE...");
+		exit(1);
+	}
+}
+
+//짝수턴 초기화 액션 4
+void madongseok_action_no_even_number_round4() {
+	if (turn % 2 == 0) {
+		madongseok_holding_zombie = 0;
+	}
+}
+
+//줄바꾸기 함수 4
+void changing_the_line_round4() {
+	printf("\n");
+}
+
+//좀비가 된 시민1 행동 4
+void zombie_citizen1_action_round4() {
+	if (citizen1_zombie == 1) {
+		if (citizen1 == citizen2 + 1) {
+			citizen_count--;
+			citizen2_zombie = 1;
+			printf("zombie(c1) attack citizen2..!\n");
+			printf("now, citizen2 is zombie...\n");
+		}
+		if (citizen1 == citizen3 + 1) {
+			citizen_count--;
+			citizen3_zombie = 1;
+			printf("zombie(c1) attack citizen3..!\n");
+			printf("now, citizen3 is zombie...\n");
+		}
+	}
+}
+
+//좀비가 된 시민2 행동 4
+void zombie_citizen2_action_round4() {
+	if (citizen2_zombie == 1) {
+		if (citizen2 == citizen3 + 1) {
+			citizen_count--;
+			citizen3_zombie = 1;
+			printf("zombie(c2) attack citizen3..!\n");
+			printf("now, citizen3 is zombie...\n");
+		}
+	}
+}
+
+//좀비가 된 시민3 행동 4
+void zombie_citizen3_action_round4() {
+	if (citizen3_zombie == 1) {
+		citizen_count = 0;
+		citizens_die_round4();
+	}
+}
+
 
 // 부산헹 (2)의 함수들을 불러오는 함수 - STAGE 1
 void round1() {
@@ -1726,6 +2497,77 @@ void round3() {
 	}
 }
 
+//부산헹 (3) 강화 좀비가 나오는 함수들을 불러오는 함수 - STAGE 4
+void round4() {
+	changing_the_line_round3();
+	game_reset();
+	printf("\n\n");
+	printf("* ROUND 4\n\n");
+	changing_the_line_round4();
+	citizens_line_round4();
+	charactor_position_round4(zombie, citizen1, citizen2, citizen3, madongseok);
+	first_train = train_round4(zombie, citizen1, citizen2, citizen3, madongseok); //기본열차 출력
+	changing_the_line_round4();
+	while (1) { //반복 시작
+		turn++;//턴 증가
+		if (citizen3 != -1) {
+			citizen3_move_round4(); //시민이동
+		}
+		if (citizen2 != -1) {
+			citizen2_move_round4(); //시민이동
+		}
+		if (citizen1 != -1) {
+			citizen1_move_round4(); //시민이동
+		}
+		zombie_move_round4(); //좀비이동
+
+		train_round4(zombie, citizen1, citizen2, citizen3, madongseok); //열차 출력
+
+		citizen3_now_round4(); //시민3 현재상황 출력
+		citizen2_now_round4(); //시민2 현재상황 출력
+		citizen1_now_round4(); //시민1 현재상황 출력
+		zombie_now_round4(); //좀비 현재상황 출력
+
+		madongseok_move_with_zombie_round4();//마동석 주변에 좀비 있을 때 이동
+		madongseok_move_no_zombie_round4();//마동석 주변에 좀비 없을 때 이동
+
+		train_round4(zombie, citizen1, citizen2, citizen3, madongseok); //두 번째 열차 출력
+
+		changing_the_line_round4(); //줄 변경
+
+		madongseok_now_round4(); //마동석 현재상황 출력
+
+		citizen3_win_round4(); //시민1 탈출했을경우
+		result3_round4(); //시민 1결과 출력
+		zombie_citizen1_action_round4(); // 좀비가 된 시민 행동
+		citizen2_win_round4(); //시민2 탈출했을경우
+		result2_round4(); //시민 2결과 출력
+		zombie_citizen2_action_round4(); // 좀비가 된 시민 행동
+		citizen1_win_round4(); //시민3 탈출했을경우
+		result1_round4();  //시민 3결과 출력
+		zombie_citizen3_action_round4(); // 좀비가 된 시민 행동
+
+		citizens_left_round4(); //시민이 탈출에 성공하였는가?
+		citizens_die_round4(); //시민이 탈출에 실패하였는가?
+		citizens_left_round4(); //시민이 탈출에 성공하였는가?
+		citizens_die_round4(); //시민이 탈출에 실패하였는가?
+
+
+		zombie_action_nobody_round4(); //좀비 행동(주변 아무도 없을때)
+		zombie_action_aggro_fight_round4(); //좀비 행동(어그로 더 높은 쪽 공격 (시민 공격시 게임 끝, 마동석 공격시 STM 1감소))
+		zombie_action_attack_citizen_round4(); //좀비 행동(시민을 물었을 때)
+
+		madongseok_action_round4(); //마동석 액션
+		madongseok_action_no_even_number_round4(); //짝수 턴일 때 실행되면 안되는 것들 초기화
+		changing_the_line_round4(); //줄 변경
+		madongseok_result_rest_round4(); //마동석 휴식 액션 결과 출력
+		madongseok_result_provoke_round4(); //마동석 도발 액션 결과 출력
+		madongseok_result_pull_round4(); //마동석 좀비 붙들기 액션 결과 출력
+
+		madongseok_stamina_zero_round4(); //마동석 체력이 0일 때
+	}
+}
+
 //총 메인 함수
 int main(void) {
 	srand((unsigned int)time(NULL)); //난수 설정
@@ -1734,7 +2576,6 @@ int main(void) {
 	madongseok_stamina = variables("madongseok stamina", STM_MIN, STM_MAX); //마동석 스테미나 입력
 	madongseok_stamina_get = madongseok_stamina;
 	percentile_probability = variables("percentile probability \'p\'", PROB_MIN, PROB_MAX); //확률 입력
-
 	printf("\n* ROUND 1\n");
 	round1();
 }
