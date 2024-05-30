@@ -2394,6 +2394,7 @@ void round1() {
 //부산헹 (3) 빌런 추가한 함수들을 불러오는 함수 - STAGE 2
 void round2() {
 	changing_the_line();
+	game_reset();
 	charactor_position_round2(zombie, citizen1, madongseok, villain);
 	first_train = train_round2(zombie, citizen1, madongseok, villain); //기본열차 출력
 	changing_the_line();
@@ -2434,6 +2435,7 @@ void round2() {
 void round3() {
 	changing_the_line_round3();
 	printf("\n\n");
+	game_reset();
 	printf("* ROUND 3\n\n");
 	citizens_line_round3();
 	charactor_position(zombie, citizen1, citizen2, citizen3, madongseok);
